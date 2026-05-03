@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getRecipes } from '../api/recipes';
 import RecipeCard from '../components/RecipeCard';
 import SearchBar from '../components/SearchBar';
+import { useAuth } from '../context/AuthContext';
 
 const CUISINES = ['', 'Italian', 'Mexican', 'Asian', 'American', 'Mediterranean', 'Indian', 'French', 'Moroccan'];
 const DIETS = [
@@ -16,6 +18,7 @@ const SORTS = [
 ];
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
   const [recipes, setRecipes] = useState([]);
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,6 +49,40 @@ export default function Home() {
   };
 
   const displayed = searchResults !== null ? searchResults : recipes;
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center text-center py-24 px-4">
+        <div className="text-7xl mb-6">🍳</div>
+        <h1 className="text-4xl font-bold text-gray-900 mb-3">Welcome to RecipeShare</h1>
+        <p className="text-lg text-gray-500 mb-8 max-w-md">
+          Discover, create and share amazing recipes from around the world. Join our community of food lovers.
+        </p>
+        <div className="flex gap-4">
+          <Link to="/register" className="btn-primary px-8 py-3 text-base">
+            Create an Account
+          </Link>
+          <Link to="/login" className="btn-secondary px-8 py-3 text-base">
+            Sign In
+          </Link>
+        </div>
+        <div className="mt-16 grid grid-cols-3 gap-8 text-center max-w-lg">
+          <div>
+            <p className="text-3xl font-bold text-brand-500">8+</p>
+            <p className="text-sm text-gray-500 mt-1">Recipes</p>
+          </div>
+          <div>
+            <p className="text-3xl font-bold text-brand-500">3+</p>
+            <p className="text-sm text-gray-500 mt-1">Cuisines</p>
+          </div>
+          <div>
+            <p className="text-3xl font-bold text-brand-500">Free</p>
+            <p className="text-sm text-gray-500 mt-1">Forever</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
