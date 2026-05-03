@@ -17,12 +17,27 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+connectDB().catch(err => console.error('DB connection error:', err.message));
+
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ message: 'Database connection failed', error: err.message });
+  }
 });
 
 app.get('/', (req, res) => res.json({ status: 'API running' }));
+
+app.get('/api/test-db', async (req, res) => {
+  try {
+    await connectDB();
+    res.json({ status: 'MongoDB connected OK' });
+  } catch (err) {
+    res.status(500).json({ status: 'MongoDB FAILED', error: err.message });
+  }
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
